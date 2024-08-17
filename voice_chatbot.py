@@ -2,6 +2,11 @@
 
 
 
+
+# Set up Groq API client
+client = Groq(
+    api_key="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",
+)
 import os
 import gradio as gr
 import whisper
@@ -10,7 +15,7 @@ from groq import Groq
 
 # Set up Groq API client
 client = Groq(
-    api_key="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",
+    api_key=os.environ.get("GROQ_API_KEY"),
 )
 
 # Load Whisper model
@@ -39,14 +44,30 @@ def chatbot(audio):
 
     return response_text, "response.mp3"
 
-# Set up Gradio interface
-iface = gr.Interface(
-    fn=chatbot,
-    inputs=gr.Audio(type="filepath"),  # Corrected input parameters
-    outputs=[gr.Textbox(), gr.Audio()],
-    live=True
-)
+# Create a custom interface
+def build_interface():
+    with gr.Blocks() as demo:
+        gr.Markdown(
+            """
+            <h1 style="text-align: center; color: #4CAF50;">Voice-to-Voice Chatbot</h1>
+            <h3 style="text-align: center;">Powered by OpenAI Whisper, Llama 8B, and gTTS</h3>
+            <p style="text-align: center;">Talk to the AI-powered chatbot and get responses in real-time. Start by recording your voice.</p>
+            """
+        )
+        with gr.Row():
+            with gr.Column(scale=1):
+                audio_input = gr.Audio(type="filepath", label="Record Your Voice")
+            with gr.Column(scale=2):
+                chatbot_output_text = gr.Textbox(label="Chatbot Response")
+                chatbot_output_audio = gr.Audio(label="Audio Response")
 
-iface.launch()
+        submit_button = gr.Button("Submit")
 
+        submit_button.click(chatbot, inputs=audio_input, outputs=[chatbot_output_text, chatbot_output_audio])
 
+    return demo
+
+# Launch the interface
+if __name__ == "__main__":
+    interface = build_interface()
+    interface.launch()
