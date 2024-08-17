@@ -1,12 +1,6 @@
 # -*- coding: utf-8 -*-
 
 
-
-
-# Set up Groq API client
-client = Groq(
-    api_key="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",
-)
 import os
 import gradio as gr
 import whisper
@@ -15,9 +9,8 @@ from groq import Groq
 
 # Set up Groq API client
 client = Groq(
-    api_key=os.environ.get("GROQ_API_KEY"),
+    api_key="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",
 )
-
 # Load Whisper model
 model = whisper.load_model("base")
 
